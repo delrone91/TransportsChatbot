@@ -1,5 +1,7 @@
 # KitchenChatbot 🍳🤖
 
+![CI](https://github.com/Selma-mtch/KitchenChatbot/actions/workflows/ci.yml/badge.svg)
+
 Chatbot spécialisé dans le domaine de la cuisine utilisant une architecture Full Stack avec React, Flask et une approche RAG (Retrieval-Augmented Generation).
 
 # 📁 Structure du projet
