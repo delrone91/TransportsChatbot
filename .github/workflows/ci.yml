@@ -27,11 +27,7 @@ jobs:
         run: |
           cd backend
           pip install -r requirements.txt
-
-      - name: Test Flask app
-        run: |
-          cd backend
-          python app.py &
+          python -c "import app; print('Backend OK')"
 
   frontend:
     runs-on: ubuntu-latest
