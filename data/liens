@@ -1,0 +1,28 @@
+site:sncf.com PDF conditions de transport
+https://ressources.data.sncf.com/explore/dataset/documents-de-reference-des-gares/information/
+    
+--Références des gares voyageurs:
+    https://www.garesetconnexions.sncf/fr/entreprises-ferroviaires/document-reference-gares
+
+--Horaires des gares
+    https://ressources.data.sncf.com/explore/dataset/horaires-des-gares1/export/?sort=nom_normal
+
+--Référentiel des équipements d'accessibilité dans les gares et les trains
+    https://ressources.data.sncf.com/explore/dataset/equipements-accessibilite-sncf/export/
+
+--Accessibilité des gares
+    https://ressources.data.sncf.com/explore/dataset/accessibilite_gares/export/
+
+--Contrôle propreté en gare
+    https://ressources.data.sncf.com/explore/dataset/proprete-en-gare/export/?sort=mois&dataChart=eyJxdWVyaWVzIjpbeyJjaGFydHMiOlt7InR5cGUiOiJsaW5lIiwiZnVuYyI6IkFWRyIsInlBeGlzIjoidGF1eF9kZV9jb25mb3JtaXRlIiwic2NpZW50aWZpY0Rpc3BsYXkiOnRydWUsImNvbG9yIjoiIzY2YzJhNSJ9XSwieEF4aXMiOiJtb2lzIiwibWF4cG9pbnRzIjoiIiwidGltZXNjYWxlIjoibW9udGgiLCJzb3J0IjoiIiwiY29uZmlnIjp7ImRhdGFzZXQiOiJwcm9wcmV0ZS1lbi1nYXJlIiwib3B0aW9ucyI6eyJzb3J0IjoibW9pcyJ9fX1dLCJkaXNwbGF5TGVnZW5kIjp0cnVlLCJhbGlnbk1vbnRoIjp0cnVlfQ%3D%3D
+
+--Fréquentation en   gares (2015 à 2024)
+    https://ressources.data.sncf.com/explore/dataset/frequentation-gares/information/?disjunctive.nom_gare&disjunctive.code_postal
+
+site:ratp.fr PDF guide voyageur
+
+--fiche horaires des lignes à télécharger
+
+    https://www.ratp.fr/horaires-rer-transilien?network-current=rer-transilien&networks=rer-transilien&line_rer-transilien=A&line_str_id_rer-transilien=LIG%3AIDFM%3AC01742
+
+    https://www.iledefrance-mobilites.fr/cgvu-navigo-liberte
