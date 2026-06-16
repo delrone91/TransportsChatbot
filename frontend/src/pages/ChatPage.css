@@ -1,0 +1,108 @@
+.chat-layout {
+  display: flex;
+  height: 100vh;
+  background: #0d1117;
+  color: #e2e8f0;
+}
+
+/* ── Main area ─────────────────────────────── */
+.chat-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: #0d1117;
+}
+
+.chat-header h2 {
+  font-size: 16px;
+  font-weight: 500;
+  color: #e2e8f0;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Empty state ───────────────────────────── */
+.chat-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 40px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 64px;
+  line-height: 1;
+}
+
+.chat-empty h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin: 0;
+}
+
+.chat-empty > p {
+  color: #64748b;
+  font-size: 15px;
+  margin: 0;
+}
+
+.empty-suggestions {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 480px;
+}
+
+.suggestions-label {
+  font-size: 13px;
+  color: #4b5563;
+  text-align: left;
+}
+
+.suggestion {
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  color: #a5b4fc;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.suggestion:hover {
+  background: rgba(99, 102, 241, 0.15);
+}
+
+.btn-create {
+  margin-top: 8px;
+  padding: 12px 28px;
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-create:hover {
+  background: #4f46e5;
+}
