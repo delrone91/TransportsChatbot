@@ -1,319 +1,145 @@
-# TransportsChatbot 🍳🤖
+# NavigIA — Assistant Transports Île-de-France
 
-![CI](https://github.com/Selma-mtch/TransportsChatbot/actions/workflows/ci.yml/badge.svg)
-
-Chatbot spécialisé dans le domaine de la cuisine utilisant une architecture Full Stack avec React, Flask et une approche RAG (Retrieval-Augmented Generation).
-
-# 📁 Structure du projet
-
-```bash
-TransportsChatbot/
-│
-├── backend/
-│   ├── app.py                 # Point d'entrée Flask
-│   ├── chatbot/               # Environnement virtuel Python
-│   ├── db/                    # Base de données
-│   ├── models/                # Modèles SQLAlchemy
-│   ├── rag/                   # Logique RAG
-│   ├── routes/                # Routes API Flask
-│   ├── services/              # Services métier
-│   └── requirements.txt       # Dépendances Python
-│
-├── frontend/
-│   ├── public/
-│   ├── src/                   # Code source React
-│   ├── package.json
-│   └── vite.config.js
-│   
-│
-├── data/                      # PDFs / documents culinaires
-│
-├── .gitignore
-├── package.json
-└── README.md
-```
+Chatbot spécialisé dans les transports en commun français (SNCF, RATP, IDFM).  
+Architecture Full Stack : React + Flask + RAG (ChromaDB) + LLM (OpenRouter) + Recherche web (Tavily).
 
 ---
 
-# ⚙️ Installation du projet
+## Prérequis
 
-## 1️⃣ Cloner le projet
+- **Python 3.9+**
+- **Node.js 18+**
+- Un compte gratuit sur [openrouter.ai](https://openrouter.ai) → pour le LLM
+- Un compte gratuit sur [tavily.com](https://tavily.com) → pour la recherche web
+
+---
+
+## Installation
+
+### 1. Cloner le projet
 
 ```bash
-git clone git@github.com:Selma-mtch/TransportsChatbot.git
-```
-
-Puis :
-
-```bash
+git clone https://github.com/Selma-mtch/TransportsChatbot.git
 cd TransportsChatbot
 ```
 
 ---
 
-# 🐍 Backend - Flask
-
-## 2️⃣ Aller dans le dossier backend
+### 2. Configurer le backend
 
 ```bash
 cd backend
 ```
 
----
+#### Créer l'environnement virtuel Python
 
-## 3️⃣ Créer l’environnement virtuel Python
+> Le venv doit obligatoirement s'appeler `chatbot`
 
 ```bash
 python3 -m venv chatbot
 ```
 
----
-
-## 4️⃣ Activer l’environnement virtuel
-
-### Linux / WSL
+#### Installer les dépendances
 
 ```bash
-source chatbot/bin/activate
+chatbot/bin/pip install -r requirements.txt
 ```
 
-### Windows
+> Sur Windows : `chatbot\Scripts\pip install -r requirements.txt`
+
+#### Créer le fichier `.env`
 
 ```bash
-chatbot\\Scripts\\activate
+cp .env.example .env
 ```
 
-Le terminal doit afficher :
+Puis ouvrir `.env` et renseigner :
+
+```env
+SECRET_KEY=une-chaine-aleatoire-longue
+OPENROUTER_API_KEY=sk-or-v1-...   # Récupérer sur openrouter.ai → Keys
+TAVILY_API_KEY=tvly-dev-...       # Récupérer sur tavily.com → API Keys
+```
+
+Les autres valeurs peuvent rester telles quelles.
+
+#### Lancer le backend
 
 ```bash
-(chatbot)
+chatbot/bin/python3 app.py
 ```
 
----
+> Sur Windows : `chatbot\Scripts\python app.py`
 
-## 5️⃣ Installer les dépendances Python
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
-## 6️⃣ Lancer le backend Flask
-
-```bash
-python app.py
-```
-
-Backend disponible sur :
-
-```txt
-http://127.0.0.1:5000
-```
+Le backend démarre sur `http://localhost:5001`.  
+**Au premier démarrage**, l'indexation RAG se lance automatiquement (~2 minutes). C'est normal.
 
 ---
 
-# ⚛️ Frontend - React
+### 3. Configurer le frontend
 
-## 7️⃣ Ouvrir un nouveau terminal
-
-Depuis la racine du projet :
+Dans un **nouveau terminal**, depuis la racine du projet :
 
 ```bash
 cd frontend
-```
-
----
-
-## 8️⃣ Installer les dépendances NodeJS
-
-```bash
 npm install
-```
-
----
-
-## 9️⃣ Lancer le frontend React
-
-```bash
 npm run dev
 ```
 
-Frontend disponible sur :
+Le frontend démarre sur `http://localhost:5173`.
 
-```txt
-http://localhost:5173
+---
+
+### 4. Ouvrir l'application
+
+Aller sur [http://localhost:5173](http://localhost:5173), créer un compte et commencer à discuter.
+
+---
+
+## Fonctionnalités
+
+| Fonctionnalité | Description |
+|---------------|-------------|
+| 💬 Chat | Conversations persistantes avec historique |
+| 📊 RAG | Données officielles SNCF/IDFM (tarifs, horaires, fréquentation, propreté) |
+| 🌐 Recherche web | Résultats temps réel via Tavily si le RAG ne trouve pas |
+| 🎤 Voix | Dictée vocale via Web Speech API (Chrome/Edge/Safari) |
+| 🔐 Auth | Inscription / connexion sécurisée |
+
+---
+
+## Structure du projet
+
 ```
----
-
-# 🔥 Workflow de développement
-
-## ▶️ Workflow recommandé
-
-1. Lancer le backend Flask
-2. Lancer le frontend React
-3. Développer les routes API Flask
-4. Connecter React ↔ Flask
-5. Ajouter le système RAG
-6. Tester les fonctionnalités
-
----
-
-# 🧠 Fonctionnalités prévues
-
-## 🔐 Authentification
-
-- Création de compte
-- Connexion utilisateur
-- Gestion des sessions
-
----
-
-## 💬 Chatbot
-
-- Discussions style ChatGPT
-- Historique des conversations
-- Suppression des conversations
-- Création de nouvelles sessions
-
----
-
-## 🍳 Domaine spécialisé : Transports
-
-- horaires
-- tarifs
-- abonnements
-- remboursement
-- procédures administratives
-- Recherche d’informations dans les documents
----
-
-## 🧠 Intelligence Artificielle
-
-- Intégration d’un LLM
-- Système RAG
-- Embeddings HuggingFace
-- Recherche contextuelle
-
----
-
-## 🌍 Recherche web (option bonus)
-
-- Recherche internet via DuckDuckGo
-- Complément d’informations externes
-
----
-
-## 🎤 Option voix
-
-- Transcription audio avec Whisper
-- Interaction vocale utilisateur
-
----
-
-# 📦 Dépendances principales
-
-## 🐍 Backend
-
-```txt
-Flask
-Flask-CORS
-SQLAlchemy
-LangChain
-ChromaDB
-sentence-transformers
-transformers
+TransportsChatbot/
+├── data/json/              ← Données SNCF/IDFM
+├── backend/
+│   ├── app.py              ← Point d'entrée Flask
+│   ├── .env.example        ← Template de configuration
+│   ├── requirements.txt    ← Dépendances Python
+│   ├── core/               ← LLM, RAG, recherche web
+│   ├── repositories/       ← Accès base de données
+│   ├── services/           ← Logique métier
+│   └── controllers/        ← Routes HTTP
+└── frontend/
+    └── src/
+        ├── components/
+        ├── pages/
+        └── context/
 ```
 
 ---
 
-## ⚛️ Frontend
+## Problèmes fréquents
 
-```txt
-ReactJS
-Vite
-Axios
-```
+**Le backend ne démarre pas**
+→ Vérifier que le venv s'appelle bien `chatbot` et que `.env` existe avec les clés API.
 
----
+**L'indexation prend longtemps**
+→ Normal au premier démarrage. Elle ne se refait pas aux démarrages suivants.
 
-# 🛠️ Commandes utiles
+**Le bot répond "tous les modèles sont surchargés"**
+→ Les modèles gratuits OpenRouter ont des limites. Réessayer dans 30 secondes.
 
-## ▶️ Activer le venv Python
-
-```bash
-source chatbot/bin/activate
-```
-
----
-
-## ⛔ Désactiver le venv
-
-```bash
-deactivate
-```
-
----
-
-## 📦 Installer une nouvelle dépendance Python
-
-```bash
-pip install nom_du_package
-```
-
-Puis mettre à jour :
-
-```bash
-pip freeze > requirements.txt
-```
-
----
-
-## 📦 Installer une dépendance React
-
-```bash
-npm install nom-du-package
-```
-
----
-
-## 🔄 Réinstaller les dépendances frontend
-
-```bash
-rm -rf node_modules
-npm install
-```
-
----
-
-## 🚀 Lancer le frontend
-
-```bash
-npm run dev
-```
-
----
-
-## 🚀 Lancer le backend
-
-```bash
-python app.py
-```
-
----
-
-## 📋 Vérifier les fichiers suivis par Git
-
-```bash
-git status
-```
-
----
-
-## 📤 Push sur GitHub
-
-```bash
-git add .
-git commit -m "message"
-git push
-```
+**La dictée vocale ne fonctionne pas**
+→ Uniquement disponible sur Chrome, Edge et Safari. Pas sur Firefox.

@@ -23,3 +23,7 @@ Thumbs.db
 # Database
 *.sqlite3
 *.db
+backend/chroma_db/
+
+# Claude Code
+.claude/
