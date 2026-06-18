@@ -52,13 +52,12 @@ export default function ChatPage() {
   }
 
   // Envoie un message dans une session donnée et attend la réponse du bot
-  const sendMessageToSession = async (session, content) => {
+  const sendMessageToSession = async (session, content, useWeb = false) => {
     const tempId = Date.now()
-    // On affiche le message utilisateur immédiatement (sans attendre le serveur)
     setMessages(prev => [...prev, { id: tempId, role: 'user', content }])
     setSending(true)
     try {
-      const r = await client.post(`/chat/sessions/${session.id}/messages`, { content })
+      const r = await client.post(`/chat/sessions/${session.id}/messages`, { content, use_web: useWeb })
       // On remplace le message temporaire par les vrais messages retournés par le backend
       setMessages(prev => [
         ...prev.filter(m => m.id !== tempId),
@@ -78,9 +77,9 @@ export default function ChatPage() {
   }
 
   // Utilisé par le champ de saisie (conversation déjà ouverte)
-  const sendMessage = async (content) => {
+  const sendMessage = async (content, useWeb = false) => {
     if (!activeSession || sending) return
-    await sendMessageToSession(activeSession, content)
+    await sendMessageToSession(activeSession, content, useWeb)
   }
 
   // Utilisé par les boutons de suggestion : crée une session ET envoie le message directement
@@ -117,19 +116,24 @@ export default function ChatPage() {
         ) : (
           // Page d'accueil affichée quand aucune conversation n'est sélectionnée
           <div className="chat-empty">
-            <div className="empty-icon">🚆</div>
-            <h2>TransportBot</h2>
-            <p>Votre assistant pour les transports en commun français</p>
+            <div className="empty-logo">
+              <img src="/logo.png" alt="NavigIA" />
+            </div>
+            <h2 className="empty-title">NAVIG<span>IA</span></h2>
+            <p className="empty-subtitle">Votre assistant transports Île-de-France</p>
+            <p className="suggestions-label">Exemples de questions</p>
             <div className="empty-suggestions">
-              <p className="suggestions-label">Exemples de questions :</p>
               <button className="suggestion" onClick={() => createSessionAndSend('Quel est le prix du forfait Navigo mensuel ?')}>
                 Quel est le prix du forfait Navigo mensuel ?
               </button>
-              <button className="suggestion" onClick={() => createSessionAndSend('Quels équipements pour les personnes handicapées en gare ?')}>
-                Quels équipements pour les personnes handicapées en gare ?
+              <button className="suggestion" onClick={() => createSessionAndSend('Quelle est la fréquentation de la gare Paris Gare de Lyon en 2024 ?')}>
+                Quelle est la fréquentation de la gare Paris Gare de Lyon en 2024 ?
               </button>
-              <button className="suggestion" onClick={() => createSessionAndSend('Comment fonctionne le Navigo Liberté+ ?')}>
-                Comment fonctionne le Navigo Liberté+ ?
+              <button className="suggestion" onClick={() => createSessionAndSend('Quel est le taux de propreté de la gare de Bordeaux Saint-Jean ?')}>
+                Quel est le taux de propreté de la gare de Bordeaux Saint-Jean ?
+              </button>
+              <button className="suggestion" onClick={() => createSessionAndSend('Quels équipements PMR sont disponibles en gare ?')}>
+                Quels équipements PMR sont disponibles en gare ?
               </button>
             </div>
             <button className="btn-create" onClick={createSession}>

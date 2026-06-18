@@ -60,6 +60,7 @@ class Message(Base):
     id = Column(Integer, primary_key=True)
     role = Column(String(20), nullable=False)  # 'user' pour l'humain, 'assistant' pour le bot
     content = Column(Text, nullable=False)
+    source = Column(String(10), nullable=True)  # 'rag', 'web', ou None
     created_at = Column(DateTime, default=_now)
     session_id = Column(Integer, ForeignKey('conversation_sessions.id'), nullable=False)
     session = relationship('ConversationSession', back_populates='messages')

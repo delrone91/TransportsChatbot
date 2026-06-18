@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 # On charge les variables d'environnement depuis le fichier .env
 # Comme ça on ne met pas les clés API directement dans le code
-load_dotenv()
+load_dotenv(override=True)
 
 # Clé pour accéder à OpenRouter (le service qui nous donne accès aux LLMs)
 OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY', '')
@@ -22,3 +22,6 @@ CHROMA_PATH = os.getenv('CHROMA_PATH', './chroma_db')
 
 # Chemin vers les fichiers JSON contenant les données SNCF/IDFM
 DATA_PATH = os.getenv('DATA_PATH', '../data/json')
+
+# Clé Tavily pour la recherche web
+TAVILY_API_KEY = os.getenv('TAVILY_API_KEY', '')

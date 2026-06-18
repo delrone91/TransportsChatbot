@@ -1,22 +1,33 @@
 .input-bar {
-  padding: 12px 20%;
-  background: #0d1117;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 14px 20%;
+  background: var(--bg);
+  border-top: 1px solid var(--border-light);
+  flex-shrink: 0;
 }
 
 .input-wrapper {
   display: flex;
   align-items: flex-end;
-  gap: 10px;
-  background: #1e2235;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  gap: 8px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 14px;
   padding: 10px 12px;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .input-wrapper:focus-within {
-  border-color: rgba(99, 102, 241, 0.5);
+  border-color: rgba(0, 87, 168, 0.5);
+  box-shadow: 0 0 0 3px rgba(0, 87, 168, 0.08);
+}
+
+.input-wrapper--web {
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+.input-wrapper--web:focus-within {
+  border-color: rgba(16, 185, 129, 0.6);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.06);
 }
 
 .input-wrapper textarea {
@@ -24,53 +35,121 @@
   background: transparent;
   border: none;
   outline: none;
-  color: #e2e8f0;
+  color: var(--text);
   font-size: 14px;
   line-height: 1.6;
   resize: none;
   max-height: 160px;
   overflow-y: auto;
-  font-family: inherit;
+  font-family: var(--sans);
 }
 
-.input-wrapper textarea::placeholder {
-  color: #4b5563;
+.input-wrapper textarea::placeholder { color: var(--text-muted); }
+.input-wrapper textarea::-webkit-scrollbar { width: 3px; }
+.input-wrapper textarea::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* ── Web toggle ────────────────────────────── */
+.web-toggle {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid var(--border-light);
+  color: var(--text-muted);
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
 }
 
-.input-wrapper textarea::-webkit-scrollbar { width: 4px; }
-.input-wrapper textarea::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+.web-toggle:hover {
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.07);
+}
 
+.web-toggle--active {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.5);
+  color: #6ee7b7;
+}
+
+/* ── Mic button ────────────────────────────── */
+.mic-btn {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid var(--border-light);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.mic-btn:hover {
+  border-color: rgba(0, 87, 168, 0.4);
+  color: var(--blue-light);
+  background: rgba(0, 87, 168, 0.07);
+}
+
+.mic-btn--active {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #f87171;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  50%       { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+}
+
+/* ── Send button ───────────────────────────── */
 .send-btn {
   flex-shrink: 0;
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: 8px;
-  background: #6366f1;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
   border: none;
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.15s, opacity 0.15s;
+  transition: opacity 0.15s;
 }
 
-.send-btn:hover:not(:disabled) {
-  background: #4f46e5;
-}
+.send-btn:hover:not(:disabled) { opacity: 0.85; }
 
 .send-btn:disabled {
-  opacity: 0.35;
+  opacity: 0.3;
   cursor: not-allowed;
 }
 
+/* ── Hints ─────────────────────────────────── */
 .input-hint {
   font-size: 11px;
-  color: #374151;
+  color: var(--text-muted);
   text-align: center;
   margin-top: 6px;
 }
 
+.web-hint {
+  font-size: 11px;
+  color: #6ee7b7;
+  text-align: center;
+  margin-top: 6px;
+  opacity: 0.75;
+}
+
 @media (max-width: 900px) {
-  .input-bar { padding: 12px 12px; }
+  .input-bar { padding: 12px; }
 }

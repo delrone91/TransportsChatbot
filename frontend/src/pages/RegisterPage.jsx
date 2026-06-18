@@ -27,8 +27,14 @@ export default function RegisterPage() {
   return (
     <div className="auth-page">
       <div className="auth-box">
-        <div className="auth-logo">🚆 TransportBot</div>
-        <p className="auth-subtitle">Assistant transport en commun IA</p>
+        <div className="auth-logo">
+          <div className="auth-logo-icon">
+            <img src="/logo.png" alt="NavigIA" />
+          </div>
+          <div className="auth-logo-name">NAVIG<span>IA</span></div>
+        </div>
+        <p className="auth-subtitle">Assistant transports Île-de-France</p>
+
         <h1>Inscription</h1>
         <form onSubmit={submit}>
           <div className="form-group">
@@ -40,7 +46,7 @@ export default function RegisterPage() {
             <input type="email" value={form.email} onChange={update('email')} required />
           </div>
           <div className="form-group">
-            <label>Mot de passe <span className="hint">(min. 6 caractères)</span></label>
+            <label>Mot de passe <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(min. 6 caractères)</span></label>
             <input type="password" value={form.password} onChange={update('password')} minLength={6} required />
           </div>
           {error && <p className="form-error">{error}</p>}

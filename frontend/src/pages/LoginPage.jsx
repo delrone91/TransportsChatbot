@@ -27,8 +27,14 @@ export default function LoginPage() {
   return (
     <div className="auth-page">
       <div className="auth-box">
-        <div className="auth-logo">🚆 TransportBot</div>
-        <p className="auth-subtitle">Assistant transport en commun IA</p>
+        <div className="auth-logo">
+          <div className="auth-logo-icon">
+            <img src="/logo.png" alt="NavigIA" />
+          </div>
+          <div className="auth-logo-name">NAVIG<span>IA</span></div>
+        </div>
+        <p className="auth-subtitle">Assistant transports Île-de-France</p>
+
         <h1>Connexion</h1>
         <form onSubmit={submit}>
           <div className="form-group">
