@@ -1,84 +1,215 @@
-# NavigIA — Assistant Transports Île-de-France
+# NavigIA - Assistant transports Ile-de-France
 
-Chatbot spécialisé dans les transports en commun français (SNCF, RATP, IDFM).  
-Architecture Full Stack : React + Flask + RAG (ChromaDB) + LLM (OpenRouter) + Recherche web (Tavily).
+NavigIA est une application full stack de chatbot specialise dans les transports en commun en France, avec un focus sur les donnees SNCF, Transilien, RATP et Ile-de-France Mobilites.
 
----
+Le projet combine une interface React, une API Flask, une base SQLite, un pipeline RAG avec LangChain et ChromaDB, et un LLM appele via OpenRouter.
 
-## Prérequis
+## Architecture
 
-- **Python 3.9+**
-- **Node.js 18+**
-- Un compte gratuit sur [openrouter.ai](https://openrouter.ai) → pour le LLM
-- Un compte gratuit sur [tavily.com](https://tavily.com) → pour la recherche web
-
----
-
-## Installation
-
-### 1. Cloner le projet
-
-```bash
-git clone https://github.com/Selma-mtch/TransportsChatbot.git
-cd TransportsChatbot
+```text
+React / Vite
+    |
+API Flask
+    |
+SQLAlchemy + SQLite
+    |
+LangChain + ChromaDB + Hugging Face Embeddings
+    |
+OpenRouter
 ```
 
----
+Technologies principales :
 
-### 2. Configurer le backend
+| Partie | Technologie |
+| --- | --- |
+| Frontend | React, Vite, react-markdown, remark-gfm |
+| Backend | Flask, Flask-CORS |
+| Base applicative | SQLite, SQLAlchemy |
+| RAG | LangChain, ChromaDB |
+| Embeddings | Hugging Face, `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` |
+| LLM | OpenRouter |
+| Recherche web | Tavily, limitee aux sources fiables |
+
+## Fonctionnalites
+
+| Fonctionnalite | Description |
+| --- | --- |
+| Authentification | Inscription et connexion utilisateur |
+| Sessions | Creation, liste, renommage et suppression de conversations |
+| Historique | Sauvegarde des messages utilisateur et assistant |
+| Chatbot RAG | Recherche dans une base documentaire locale avant generation |
+| Sources | Affichage des sources RAG et web utilisees |
+| Fallback web | Recherche web si le RAG ne trouve pas de contexte pertinent |
+| Markdown | Affichage lisible des listes et tableaux dans les reponses |
+
+## Donnees utilisees
+
+Les donnees locales sont stockees dans :
+
+```text
+data/json/
+```
+
+Elles contiennent notamment :
+
+- titres et tarifs Ile-de-France Mobilites ;
+- horaires de gares SNCF ;
+- frequentation des gares SNCF ;
+- equipements d'accessibilite SNCF ;
+- donnees de proprete en gare.
+
+Le projet n'utilise pas de donnees GTFS.
+
+## RAG avec LangChain
+
+Le pipeline RAG est implemente dans :
+
+```text
+backend/core/rag.py
+```
+
+Il fait les etapes suivantes :
+
+1. Chargement des fichiers JSON.
+2. Transformation des lignes en objets `Document` LangChain.
+3. Ajout de metadonnees : source, type de document, identifiant.
+4. Generation d'embeddings avec Hugging Face.
+5. Stockage des vecteurs dans ChromaDB.
+6. Recherche des documents pertinents pour chaque question.
+7. Envoi du contexte recupere au LLM via OpenRouter.
+
+Des aliases sont ajoutes pour ameliorer la recherche. Exemple :
+
+```text
+Forfait Navigo Mois
+→ forfait Navigo mensuel
+→ abonnement Navigo mensuel
+→ Navigo mensuel
+```
+
+Cela permet au chatbot de retrouver une information meme si l'utilisateur n'emploie pas exactement le meme vocabulaire que le fichier source.
+
+## Recherche web filtree
+
+Si le RAG ne trouve pas de contexte pertinent, le backend peut utiliser Tavily.
+
+Les resultats web sont filtres pour ne garder que des domaines fiables :
+
+```text
+sncf.com
+transilien.com
+iledefrance-mobilites.fr
+ratp.fr
+service-public.fr
+```
+
+Le filtrage est implemente dans :
+
+```text
+backend/core/search.py
+```
+
+## Prerequis
+
+- Python 3.9 ou plus
+- Node.js 18 ou plus
+- Une cle OpenRouter
+- Une cle Tavily si vous voulez activer le fallback web
+
+## Installation backend
+
+Depuis la racine du projet :
 
 ```bash
 cd backend
-```
-
-#### Créer l'environnement virtuel Python
-
-> Le venv doit obligatoirement s'appeler `chatbot`
-
-```bash
 python3 -m venv chatbot
+source chatbot/bin/activate
+pip install -r requirements.txt
 ```
 
-#### Installer les dépendances
+Sur Windows PowerShell :
 
-```bash
-chatbot/bin/pip install -r requirements.txt
+```powershell
+cd backend
+python -m venv chatbot
+.\chatbot\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-> Sur Windows : `chatbot\Scripts\pip install -r requirements.txt`
+## Configuration
 
-#### Créer le fichier `.env`
+Creer le fichier `.env` :
 
 ```bash
 cp .env.example .env
 ```
 
-Puis ouvrir `.env` et renseigner :
+Sur Windows PowerShell :
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Variables importantes :
 
 ```env
-SECRET_KEY=une-chaine-aleatoire-longue
-OPENROUTER_API_KEY=sk-or-v1-...   # Récupérer sur openrouter.ai → Keys
-TAVILY_API_KEY=tvly-dev-...       # Récupérer sur tavily.com → API Keys
+SECRET_KEY=une-cle-longue
+OPENROUTER_API_KEY=sk-or-v1-...
+OPENROUTER_MODEL=google/gemma-4-31b-it:free
+TAVILY_API_KEY=tvly-dev-...
+DATABASE_URL=sqlite:///chatbot.db
+CHROMA_PATH=./chroma_db
+DATA_PATH=../data/json
+HF_HOME=./hf_cache
+HF_HUB_DISABLE_SYMLINKS_WARNING=1
+PORT=5001
+FLASK_DEBUG=false
 ```
 
-Les autres valeurs peuvent rester telles quelles.
+`HF_HOME` permet de stocker le modele Hugging Face dans le dossier backend au lieu du dossier utilisateur.
 
-#### Lancer le backend
+## Lancer le backend
+
+Depuis `backend/` :
 
 ```bash
-chatbot/bin/python3 app.py
+source chatbot/bin/activate
+PYTHONUTF8=1 python app.py
 ```
 
-> Sur Windows : `chatbot\Scripts\python app.py`
+Sur Windows PowerShell :
 
-Le backend démarre sur `http://localhost:5001`.  
-**Au premier démarrage**, l'indexation RAG se lance automatiquement (~2 minutes). C'est normal.
+```powershell
+$env:PYTHONUTF8="1"
+.\chatbot\Scripts\python.exe app.py
+```
 
----
+Le backend demarre sur :
 
-### 3. Configurer le frontend
+```text
+http://localhost:5001
+```
 
-Dans un **nouveau terminal**, depuis la racine du projet :
+Au premier lancement, l'indexation ChromaDB peut prendre plusieurs minutes.
+
+## Reinitialiser l'index RAG
+
+Si les donnees ou les aliases changent, il faut supprimer l'ancien index :
+
+```bash
+rm -rf backend/chroma_db
+```
+
+Sur Windows PowerShell :
+
+```powershell
+Remove-Item -Recurse -Force backend\chroma_db
+```
+
+Puis relancer le backend.
+
+## Installation frontend
+
+Dans un second terminal :
 
 ```bash
 cd frontend
@@ -86,60 +217,71 @@ npm install
 npm run dev
 ```
 
-Le frontend démarre sur `http://localhost:5173`.
+Le frontend demarre sur :
 
----
-
-### 4. Ouvrir l'application
-
-Aller sur [http://localhost:5173](http://localhost:5173), créer un compte et commencer à discuter.
-
----
-
-## Fonctionnalités
-
-| Fonctionnalité | Description |
-|---------------|-------------|
-| 💬 Chat | Conversations persistantes avec historique |
-| 📊 RAG | Données officielles SNCF/IDFM (tarifs, horaires, fréquentation, propreté) |
-| 🌐 Recherche web | Résultats temps réel via Tavily si le RAG ne trouve pas |
-| 🎤 Voix | Dictée vocale via Web Speech API (Chrome/Edge/Safari) |
-| 🔐 Auth | Inscription / connexion sécurisée |
-
----
+```text
+http://localhost:5173
+```
 
 ## Structure du projet
 
-```
+```text
 TransportsChatbot/
-├── data/json/              ← Données SNCF/IDFM
 ├── backend/
-│   ├── app.py              ← Point d'entrée Flask
-│   ├── .env.example        ← Template de configuration
-│   ├── requirements.txt    ← Dépendances Python
-│   ├── core/               ← LLM, RAG, recherche web
-│   ├── repositories/       ← Accès base de données
-│   ├── services/           ← Logique métier
-│   └── controllers/        ← Routes HTTP
-└── frontend/
-    └── src/
-        ├── components/
-        ├── pages/
-        └── context/
+│   ├── app.py
+│   ├── config.py
+│   ├── database.py
+│   ├── models.py
+│   ├── controllers/
+│   ├── services/
+│   ├── repositories/
+│   └── core/
+│       ├── rag.py
+│       ├── llm.py
+│       └── search.py
+├── data/
+│   └── json/
+├── frontend/
+│   ├── package.json
+│   └── src/
+│       ├── api/
+│       ├── components/
+│       ├── context/
+│       └── pages/
+└── README.md
 ```
 
----
+## Points importants
 
-## Problèmes fréquents
+- Le chatbot ne doit pas inventer d'informations.
+- Les reponses doivent s'appuyer sur le contexte RAG ou sur une source web fiable.
+- Les horaires precis et les informations temps reel ne doivent pas etre inventes.
+- Les dossiers `backend/chroma_db/`, `backend/hf_cache/`, `backend/chatbot/` et les fichiers `.env` ne doivent pas etre commits.
 
-**Le backend ne démarre pas**
-→ Vérifier que le venv s'appelle bien `chatbot` et que `.env` existe avec les clés API.
+## Problemes frequents
 
-**L'indexation prend longtemps**
-→ Normal au premier démarrage. Elle ne se refait pas aux démarrages suivants.
+**Le backend relance deux fois l'indexation**
 
-**Le bot répond "tous les modèles sont surchargés"**
-→ Les modèles gratuits OpenRouter ont des limites. Réessayer dans 30 secondes.
+Mettre dans `.env` :
 
-**La dictée vocale ne fonctionne pas**
-→ Uniquement disponible sur Chrome, Edge et Safari. Pas sur Firefox.
+```env
+FLASK_DEBUG=false
+```
+
+**Impossible de supprimer `chroma_db`**
+
+Un processus Python utilise probablement ChromaDB. Arreter le backend puis supprimer le dossier.
+
+**Le chatbot repond avec le web alors que la donnee existe**
+
+Supprimer `backend/chroma_db/`, relancer le backend et laisser l'indexation se terminer.
+
+**Les tableaux Markdown s'affichent mal**
+
+Le frontend utilise `remark-gfm` pour afficher les tableaux. Relancer :
+
+```bash
+cd frontend
+npm install
+npm run dev
+```

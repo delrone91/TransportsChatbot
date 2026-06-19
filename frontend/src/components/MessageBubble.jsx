@@ -1,9 +1,16 @@
 import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import './MessageBubble.css'
 
 const SOURCE_LABELS = {
   rag: { icon: '📊', label: 'Données SNCF/IDFM' },
   web: { icon: '🌐', label: 'Source web' },
+}
+
+function normalizeMarkdown(content = '') {
+  return content
+    .replace(/\|\s+\|(?=\s*[-\wÀ-ÿ])/g, '|\n|')
+    .replace(/(\|[\s:-]+\|)\s+\|/g, '$1\n|')
 }
 
 export default function MessageBubble({ message }) {
@@ -15,11 +22,21 @@ export default function MessageBubble({ message }) {
     ? message.web_sources
     : []
 
+  const ragSources = message.role === 'assistant' && message.rag_sources?.length > 0
+    ? Array.from(
+        new Map(
+          message.rag_sources.map((src) => [`${src.source}-${src.type}`, src])
+        ).values()
+      )
+    : []
+
+  const renderedContent = normalizeMarkdown(message.content)
+
   return (
     <div className={`message ${message.role}`}>
       <div className="bubble">
         {message.role === 'assistant'
-          ? <ReactMarkdown>{message.content}</ReactMarkdown>
+          ? <ReactMarkdown remarkPlugins={[remarkGfm]}>{renderedContent}</ReactMarkdown>
           : message.content}
       </div>
 
@@ -42,6 +59,16 @@ export default function MessageBubble({ message }) {
             >
               {s.title}
             </a>
+          ))}
+        </div>
+      )}
+
+      {ragSources.length > 0 && (
+        <div className="sources">
+          {ragSources.map((src, index) => (
+            <div key={index}>
+              Source : {src.source} - {src.type}
+            </div>
           ))}
         </div>
       )}

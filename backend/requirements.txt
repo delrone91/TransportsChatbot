@@ -7,3 +7,8 @@ requests==2.32.5
 sentence-transformers==5.1.2
 chromadb==1.5.9
 tavily-python==0.7.26
+
+langchain
+langchain-core
+langchain-chroma #pour intégration LangChain avec ChromaDB
+langchain-huggingface #embeddings Hugging Face via LangChain

@@ -10,41 +10,126 @@ Données indexées :
 """
 import os
 import json
+import re
+import unicodedata
 from collections import defaultdict
 
 try:
-    from sentence_transformers import SentenceTransformer
-    import chromadb
+    from langchain_core.documents import Document
+    from langchain_chroma import Chroma
+    from langchain_huggingface import HuggingFaceEmbeddings
     RAG_AVAILABLE = True
 except ImportError:
     RAG_AVAILABLE = False
 
 from config import CHROMA_PATH, DATA_PATH
 
-_model = None
-_collection = None
-
 COLLECTION_NAME = 'transport_data_v3'
-RELEVANCE_THRESHOLD = 0.7
+RELEVANCE_THRESHOLD = 1.6
+MIN_KEYWORD_OVERLAP = 1
+
+_embeddings = None
+_vectorstore = None
 
 
-def get_model():
-    global _model
-    if _model is None:
-        print("Chargement du modèle d'embedding (paraphrase-multilingual-MiniLM-L12-v2)...")
-        _model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
-    return _model
-
-
-def get_collection():
-    global _collection
-    if _collection is None:
-        client = chromadb.PersistentClient(path=CHROMA_PATH)
-        _collection = client.get_or_create_collection(
-            COLLECTION_NAME,
-            metadata={"hnsw:space": "cosine"}
+def get_embeddings():
+    global _embeddings
+    if _embeddings is None:
+        print("Chargement du modele d'embedding avec LangChain...")
+        _embeddings = HuggingFaceEmbeddings(
+            model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
         )
-    return _collection
+    return _embeddings
+
+
+def get_vectorstore():
+    global _vectorstore
+    if _vectorstore is None:
+        _vectorstore = Chroma(
+            collection_name=COLLECTION_NAME,
+            persist_directory=CHROMA_PATH,
+            embedding_function=get_embeddings(),
+        )
+    return _vectorstore
+
+
+def _make_document(content: str, source: str, doc_type: str, doc_id: str) -> Document:
+    return Document(
+        page_content=content,
+        metadata={
+            "source": source,
+            "type": doc_type,
+            "id": doc_id,
+        },
+    )
+
+
+def _build_tarif_aliases(name: str) -> str:
+    aliases_by_product = {
+        "Forfait Navigo Mois": [
+            "forfait Navigo mensuel",
+            "abonnement Navigo mensuel",
+            "Navigo mensuel",
+            "pass Navigo mensuel",
+            "forfait mensuel Navigo",
+        ],
+        "Forfait Navigo Semaine": [
+            "forfait Navigo hebdomadaire",
+            "abonnement Navigo semaine",
+            "Navigo hebdomadaire",
+            "pass Navigo semaine",
+        ],
+        "Forfait Navigo Annuel": [
+            "abonnement Navigo annuel",
+            "Navigo annuel",
+            "pass Navigo annuel",
+            "forfait annuel Navigo",
+        ],
+        "Forfait Navigo Jour": [
+            "forfait Navigo journalier",
+            "Navigo jour",
+            "pass Navigo jour",
+            "forfait journalier Navigo",
+        ],
+    }
+    aliases = aliases_by_product.get(name, [])
+    if not aliases:
+        return ""
+    return f"Alias de recherche : {', '.join(aliases)}. "
+
+
+def _normalize_text(text: str) -> str:
+    text = unicodedata.normalize("NFD", text.lower())
+    text = "".join(char for char in text if unicodedata.category(char) != "Mn")
+    return text
+
+
+def _keywords(text: str) -> set[str]:
+    stopwords = {
+        "quel", "quelle", "quels", "quelles", "dans", "avec", "pour", "sont",
+        "est", "des", "les", "une", "aux", "sur", "comment", "prix",
+    }
+    normalized = _normalize_text(text)
+    return {
+        word for word in re.findall(r"[a-z0-9]+", normalized)
+        if len(word) > 3 and word not in stopwords
+    }
+
+
+def _metadata_filter_for_query(query: str) -> dict | None:
+    normalized = _normalize_text(query)
+    if any(word in normalized for word in ["navigo", "forfait", "ticket", "tarif", "abonnement"]):
+        return {"type": "tarif"}
+    if any(word in normalized for word in ["pmr", "accessibilite", "accessible", "ascenseur", "equipement"]):
+        return {"type": "equip"}
+    return None
+
+
+def _is_relevant_result(query_words: set[str], content: str, score: float) -> bool:
+    if score <= RELEVANCE_THRESHOLD:
+        return True
+    content_words = _keywords(content)
+    return len(query_words & content_words) >= MIN_KEYWORD_OVERLAP
 
 
 def _build_tarif_chunk(item: dict) -> str:
@@ -55,8 +140,10 @@ def _build_tarif_chunk(item: dict) -> str:
     args = (item.get('selling_arguments', '') or '').replace(';', ', ')
     profile = item.get('profile_new_fr', '') or ''
     duration = item.get('duration_new_fr', '') or ''
+    aliases = _build_tarif_aliases(name)
     return (
         f"Titre de transport IDFM : {name}. "
+        f"{aliases}"
         f"Description : {desc}. "
         f"Prix : {price} {period}. "
         f"Profil : {profile}. "
@@ -129,18 +216,18 @@ def _aggregate_proprete(data: list) -> list[str]:
 
 def load_and_index_data():
     if not RAG_AVAILABLE:
-        print("⚠️  RAG désactivé : dépendances manquantes (sentence-transformers, chromadb).")
+        print("RAG desactive : dependances LangChain/Chroma manquantes.")
         return
 
-    collection = get_collection()
-    if collection.count() > 0:
-        print(f"RAG déjà indexé ({collection.count()} chunks). Chargement depuis ChromaDB.")
+    vectorstore = get_vectorstore()
+    existing_count = vectorstore._collection.count()
+    if existing_count > 0:
+        print(f"RAG deja indexe ({existing_count} documents). Chargement depuis ChromaDB.")
         return
 
-    print("Indexation complète des données de transport...")
-    model = get_model()
-    chunks = []
-    ids = []
+    print("Indexation complete des donnees de transport avec LangChain...")
+    documents = []
+    document_ids = []
     data_path = os.path.abspath(DATA_PATH)
 
     datasets = [
@@ -155,8 +242,9 @@ def load_and_index_data():
             with open(path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
             for i, item in enumerate(data):
-                chunks.append(builder(item))
-                ids.append(f"{prefix}_{i}")
+                doc_id = f"{prefix}_{i}"
+                documents.append(_make_document(builder(item), filename, prefix, doc_id))
+                document_ids.append(doc_id)
             print(f"  ✓ {len(data)} {label}")
 
     path = os.path.join(data_path, 'sncf_equipements-accessibilite-sncf.json')
@@ -164,8 +252,10 @@ def load_and_index_data():
         with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         for i, item in enumerate(data):
-            chunks.append(f"Équipement accessibilité SNCF — {item.get('column_1', '')} : {item.get('column_2', '')}")
-            ids.append(f"equip_{i}")
+            doc_id = f"equip_{i}"
+            content = f"Équipement accessibilité SNCF — {item.get('column_1', '')} : {item.get('column_2', '')}"
+            documents.append(_make_document(content, 'sncf_equipements-accessibilite-sncf.json', 'equip', doc_id))
+            document_ids.append(doc_id)
         print(f"  ✓ {len(data)} équipements accessibilité")
 
     path = os.path.join(data_path, 'sncf_proprete-en-gare.json')
@@ -174,42 +264,55 @@ def load_and_index_data():
             data = json.load(f)
         proprete_chunks = _aggregate_proprete(data)
         for i, text in enumerate(proprete_chunks):
-            chunks.append(text)
-            ids.append(f"proprete_{i}")
+            doc_id = f"proprete_{i}"
+            documents.append(_make_document(text, 'sncf_proprete-en-gare.json', 'proprete', doc_id))
+            document_ids.append(doc_id)
         print(f"  ✓ {len(proprete_chunks)} gares (agrégées depuis {len(data)} contrôles mensuels)")
 
-    if not chunks:
-        print("Aucune donnée trouvée dans", data_path)
+    if not documents:
+        print("Aucune donnee trouvee dans", data_path)
         return
 
-    print(f"Calcul des embeddings pour {len(chunks)} chunks...")
-    embeddings = model.encode(chunks, show_progress_bar=True, batch_size=64).tolist()
-
-    batch_size = 5000
-    for start in range(0, len(chunks), batch_size):
+    print(f"Calcul et stockage des embeddings pour {len(documents)} documents...")
+    batch_size = 1000
+    for start in range(0, len(documents), batch_size):
         end = start + batch_size
-        collection.add(
-            documents=chunks[start:end],
-            embeddings=embeddings[start:end],
-            ids=ids[start:end],
+        vectorstore.add_documents(
+            documents=documents[start:end],
+            ids=document_ids[start:end],
         )
-        print(f"  Indexé {min(end, len(chunks))}/{len(chunks)} chunks...")
-    print(f"✓ RAG indexé : {len(chunks)} chunks dans ChromaDB")
+        print(f"  Indexe {min(end, len(documents))}/{len(documents)} documents...")
+
+    print(f"RAG indexe : {len(documents)} documents dans ChromaDB")
 
 
-def retrieve(query: str, n_results: int = 6) -> list[str]:
+def retrieve(query: str, n_results: int = 6) -> list[dict]:
     if not RAG_AVAILABLE:
         return []
-    model = get_model()
-    collection = get_collection()
-    if collection.count() == 0:
+
+    vectorstore = get_vectorstore()
+
+    if vectorstore._collection.count() == 0:
         return []
-    query_embedding = model.encode([query])[0].tolist()
-    results = collection.query(
-        query_embeddings=[query_embedding],
-        n_results=min(n_results, collection.count()),
-        include=['documents', 'distances']
-    )
-    docs = results['documents'][0] if results['documents'] else []
-    distances = results['distances'][0] if results['distances'] else []
-    return [doc for doc, dist in zip(docs, distances) if dist < RELEVANCE_THRESHOLD]
+
+    metadata_filter = _metadata_filter_for_query(query)
+    search_kwargs = {"k": max(n_results, 8)}
+    if metadata_filter:
+        search_kwargs["filter"] = metadata_filter
+
+    results = vectorstore.similarity_search_with_score(query, **search_kwargs)
+
+    docs = []
+    query_words = _keywords(query)
+    for doc, score in results:
+        if _is_relevant_result(query_words, doc.page_content, score):
+            docs.append({
+                "content": doc.page_content,
+                "source": doc.metadata.get("source"),
+                "type": doc.metadata.get("type"),
+                "score": score,
+            })
+        if len(docs) >= n_results:
+            break
+
+    return docs

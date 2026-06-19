@@ -1,7 +1,7 @@
 .chat-window {
   flex: 1;
   overflow-y: auto;
-  padding: 28px 20%;
+  padding: 28px clamp(16px, 8vw, 140px);
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -15,17 +15,19 @@
 .message {
   display: flex;
   flex-direction: column;
-  max-width: 82%;
+  max-width: min(900px, 92%);
 }
 
 .message.user {
   align-self: flex-end;
   align-items: flex-end;
+  max-width: min(680px, 82%);
 }
 
 .message.assistant {
   align-self: flex-start;
   align-items: flex-start;
+  width: min(900px, 96%);
 }
 
 /* ── Bubbles ───────────────────────────────── */
@@ -34,6 +36,8 @@
   border-radius: 14px;
   line-height: 1.65;
   font-size: 14px;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .message.user .bubble {
@@ -49,6 +53,7 @@
   color: var(--text);
   border-radius: 14px 14px 14px 4px;
   border-left: 3px solid var(--blue);
+  width: 100%;
 }
 
 /* ── Markdown dans les réponses ─────────────── */
@@ -72,6 +77,38 @@
   color: #fff;
   margin: 10px 0 4px;
   font-size: 15px;
+}
+
+.message.assistant .bubble table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.message.assistant .bubble th,
+.message.assistant .bubble td {
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  vertical-align: top;
+  min-width: 120px;
+}
+
+.message.assistant .bubble th {
+  background: rgba(0, 87, 168, 0.18);
+  color: #fff;
+  font-weight: 600;
+  text-align: left;
+}
+
+.message.assistant .bubble td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.message.assistant .bubble tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.04);
 }
 
 /* ── Typing indicator ──────────────────────── */

@@ -6,20 +6,12 @@ from core.llm import call_llm
 from core.search import web_search
 
 SYSTEM_PROMPT = (
-    "Tu es NavigIA, un assistant spécialisé dans les transports en commun français, "
-    "notamment la SNCF et le réseau Île-de-France Mobilités (RATP/IDFM).\n"
-    "Tu aides les utilisateurs avec :\n"
-    "- Les tarifs et titres de transport (Navigo, tickets, pass, abonnements)\n"
-    "- L'accessibilité dans les gares SNCF (équipements PMR, ascenseurs, rampes)\n"
-    "- La fréquentation et la propreté des gares SNCF\n"
-    "- Les horaires des gares SNCF\n"
-    "- Les lignes de métro, RER, bus et tramway en Île-de-France\n"
-    "- Les perturbations et informations trafic\n"
-    "- Les remboursements, réclamations et démarches administratives\n\n"
-    "Réponds toujours en français, de façon claire et structurée. "
-    "Utilise les données du contexte quand elles sont disponibles. "
-    "Si tu utilises des informations du web, précise-le avec [Source web]. "
-    "Si l'information n'est pas disponible, oriente vers sncf.com ou iledefrance-mobilites.fr."
+    "Tu es un assistant spécialisé dans le transport public en France. "
+    "Tu réponds uniquement à partir du contexte fourni, qui peut venir de la base documentaire ou d'une recherche web officielle. "
+    "Si l'information n'est pas présente dans le contexte, tu dis clairement que tu ne peux pas répondre avec certitude. "
+    "Tu ne donnes pas d'horaires précis ni d'informations temps réel. "
+    "Si le contexte vient du web, tu précises que la réponse s'appuie sur une source web. "
+    "Réponds toujours en français de façon claire et structurée."
 )
 
 
@@ -82,13 +74,21 @@ class ChatService:
                 'content': reply,
                 'source': source,
                 'web_sources': web_sources,
+                'rag_sources': [
+                {
+                    "source": doc.get("source"),
+                    "type": doc.get("type"),
+                    "score": doc.get("score"),
+                }
+                for doc in context_docs
+            ] if source == "rag" else [],
             },
             'session_title': session.title,
         }
 
     def _resolve_context(self, query: str, use_web: bool) -> tuple[list, list, str | None]:
         if use_web:
-            print(f"[Web] Recherche forcée : {query[:60]}")
+            print(f"[Web] Recherche forcee : {query[:60]}")
             docs, sources = web_search(query)
             return docs, sources, 'web' if docs else None
 
@@ -96,7 +96,7 @@ class ChatService:
         if docs:
             return docs, [], 'rag'
 
-        print(f"[RAG] Aucun résultat, fallback web : {query[:60]}")
+        print(f"[RAG] Aucun resultat, fallback web : {query[:60]}")
         docs, sources = web_search(query)
         return docs, sources, 'web' if docs else None
 
@@ -104,7 +104,7 @@ class ChatService:
         today = datetime.now().strftime("%d/%m/%Y")
         system = f"Nous sommes le {today}.\n\n{SYSTEM_PROMPT}"
         if context_docs:
-            context_text = "\n".join(f"- {doc}" for doc in context_docs)
+            context_text = "\n".join(f"- {self._format_context_doc(doc)}" for doc in context_docs)
             system += f"\n\nContexte disponible :\n{context_text}"
 
         messages = [{'role': 'system', 'content': system}]
@@ -112,6 +112,16 @@ class ChatService:
             messages.append({'role': msg.role, 'content': msg.content})
         messages.append({'role': 'user', 'content': user_content})
         return messages
+
+    @staticmethod
+    def _format_context_doc(doc) -> str:
+        if isinstance(doc, dict):
+            content = doc.get('content') or doc.get('text') or ''
+            source = doc.get('source')
+            if source:
+                return f"{content} (source: {source})"
+            return content
+        return str(doc)
 
     def _get_or_404(self, session_id: int, user_id: int):
         session = self.repo.get_session(session_id, user_id)
