@@ -67,17 +67,17 @@ export default function MessageInput({ onSend, disabled }) {
         <button
           className={`web-toggle ${useWeb ? 'web-toggle--active' : ''}`}
           onClick={() => setUseWeb(v => !v)}
-          title={useWeb ? 'Recherche web activée — cliquer pour désactiver' : 'Activer la recherche web'}
+          title={useWeb ? 'Recherche web activee' : 'Activer la recherche web'}
           type="button"
         >
-          🌐
+          Web
         </button>
         <textarea
           ref={textareaRef}
           value={value}
           onChange={handleInput}
           onKeyDown={handleKeyDown}
-          placeholder={useWeb ? 'Recherche sur le web...' : 'Posez votre question sur les transports... (Entrée pour envoyer)'}
+          placeholder={useWeb ? 'Chercher une information recente...' : 'Demandez un tarif, une gare, un equipement...'}
           disabled={disabled}
           rows={1}
         />
@@ -86,7 +86,7 @@ export default function MessageInput({ onSend, disabled }) {
             className={`mic-btn ${listening ? 'mic-btn--active' : ''}`}
             onClick={toggleVoice}
             type="button"
-            title={listening ? 'Arrêter l\'écoute' : 'Dicter votre question'}
+            title={listening ? "Arreter l'ecoute" : 'Dicter la question'}
           >
             {listening ? (
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -106,8 +106,9 @@ export default function MessageInput({ onSend, disabled }) {
           </svg>
         </button>
       </div>
-      {useWeb && <p className="web-hint">🌐 La réponse utilisera une recherche internet en temps réel</p>}
-      {!useWeb && <p className="input-hint">Shift+Entrée pour sauter une ligne</p>}
+      <p className={useWeb ? 'web-hint' : 'input-hint'}>
+        {useWeb ? 'Recherche sur des sources en ligne fiables.' : 'Entree pour envoyer, Shift + Entree pour aller a la ligne.'}
+      </p>
     </div>
   )
 }

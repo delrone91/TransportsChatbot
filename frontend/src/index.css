@@ -1,35 +1,35 @@
 :root {
-  --bg:           #04091A;
-  --bg-sidebar:   #030712;
-  --bg-card:      #0A1428;
-  --bg-input:     #0D1829;
-  --bg-hover:     rgba(0, 87, 168, 0.08);
-  --bg-active:    rgba(0, 87, 168, 0.16);
+  --bg:           #f4f6f8;
+  --bg-sidebar:   #ffffff;
+  --bg-card:      #ffffff;
+  --bg-input:     #ffffff;
+  --bg-hover:     #eef3f7;
+  --bg-active:    #e5eff8;
 
-  --blue:         #0057A8;
-  --blue-light:   #1A8FE3;
-  --blue-glow:    rgba(0, 87, 168, 0.35);
-  --purple:       #7B2D9E;
-  --purple-light: #A855F7;
+  --blue:         #0b5cab;
+  --blue-light:   #2477c7;
+  --teal:         #0f766e;
+  --teal-light:   #14b8a6;
+  --yellow:       #f7c948;
 
-  --text:         #C8D8F0;
-  --text-dim:     #5A7BA0;
-  --text-muted:   #2D4A6A;
+  --text:         #162231;
+  --text-dim:     #536273;
+  --text-muted:   #8b98a8;
 
-  --border:       rgba(0, 87, 168, 0.15);
-  --border-light: rgba(0, 87, 168, 0.08);
+  --border:       #dce3ea;
+  --border-light: #edf1f5;
+  --shadow:       0 18px 45px rgba(28, 41, 56, 0.08);
 
-  /* Ligne couleurs Transilien */
-  --rera:  #E2001A;
-  --rerb:  #4F9FD5;
-  --rerc:  #F4C300;
-  --rerd:  #00814F;
-  --rere:  #C07CB8;
+  --rera:  #e2001a;
+  --rerb:  #4f9fd5;
+  --rerc:  #f4c300;
+  --rerd:  #00814f;
+  --rere:  #c07cb8;
 
   --sans: 'Inter', system-ui, -apple-system, sans-serif;
   font-family: var(--sans);
   font-size: 14px;
-  color-scheme: dark;
+  color-scheme: light;
   color: var(--text);
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
@@ -37,7 +37,16 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
-body { margin: 0; overflow: hidden; }
+body {
+  margin: 0;
+  overflow: hidden;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
 
 #root {
   width: 100vw;
@@ -46,3 +55,13 @@ body { margin: 0; overflow: hidden; }
 }
 
 a { color: var(--blue-light); }
+
+.full-loading {
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  color: var(--text-dim);
+  font-weight: 700;
+}
