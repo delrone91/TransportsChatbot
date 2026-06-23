@@ -7,7 +7,12 @@ from config import DATABASE_URL
 # utiliser la même connexion depuis plusieurs threads
 engine = create_engine(
     DATABASE_URL,
-    connect_args={'check_same_thread': False} if 'sqlite' in DATABASE_URL else {}
+    connect_args={'check_same_thread': False} if 'sqlite' in DATABASE_URL else {},
+    # pool_pre_ping teste la connexion avant chaque usage et la rouvre si elle
+    # a ete fermee. Necessaire avec Neon qui suspend la base apres inactivite
+    # (sinon erreur "SSL connection has been closed unexpectedly").
+    pool_pre_ping=True,
+    pool_recycle=300,
 )
 
 # SessionLocal permet d'ouvrir une session vers la base de données
