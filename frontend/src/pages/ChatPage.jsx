@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../context/AuthContext'
 import client from '../api/client'
 import Sidebar from '../components/Sidebar'
@@ -12,13 +12,16 @@ export default function ChatPage() {
   const [activeSession, setActiveSession] = useState(null)
   const [messages, setMessages] = useState([])
   const [sending, setSending] = useState(false)
+  const [error, setError] = useState(null)
+  const selectionRef = useRef(0) // garde anti-race pour le chargement des messages
 
   async function fetchSessions() {
     try {
       const r = await client.get('/chat/sessions')
       setSessions(r.data)
-    } catch {
-      setSessions([])
+    } catch (err) {
+      console.error(err)
+      setError('Impossible de charger les conversations.')
     }
   }
 
@@ -28,27 +31,48 @@ export default function ChatPage() {
   }, [])
 
   const createSession = async () => {
-    const r = await client.post('/chat/sessions', {})
-    setSessions(prev => [r.data, ...prev])
-    setActiveSession(r.data)
-    setMessages([])
+    try {
+      const r = await client.post('/chat/sessions', {})
+      setSessions(prev => [r.data, ...prev])
+      setActiveSession(r.data)
+      setMessages([])
+      setError(null)
+    } catch (err) {
+      console.error(err)
+      setError('Impossible de creer une conversation.')
+    }
   }
 
   const selectSession = async (session) => {
     if (activeSession?.id === session.id) return
+    const reqId = ++selectionRef.current
     setActiveSession(session)
     setMessages([])
-    const r = await client.get(`/chat/sessions/${session.id}`)
-    setMessages(r.data.messages)
+    setError(null)
+    try {
+      const r = await client.get(`/chat/sessions/${session.id}`)
+      // on n'applique la reponse que si c'est toujours la derniere session demandee
+      if (selectionRef.current === reqId) setMessages(r.data.messages)
+    } catch (err) {
+      if (selectionRef.current === reqId) {
+        console.error(err)
+        setError('Impossible de charger cette conversation.')
+      }
+    }
   }
 
   const deleteSession = async (sessionId, e) => {
     e.stopPropagation()
-    await client.delete(`/chat/sessions/${sessionId}`)
-    setSessions(prev => prev.filter(s => s.id !== sessionId))
-    if (activeSession?.id === sessionId) {
-      setActiveSession(null)
-      setMessages([])
+    try {
+      await client.delete(`/chat/sessions/${sessionId}`)
+      setSessions(prev => prev.filter(s => s.id !== sessionId))
+      if (activeSession?.id === sessionId) {
+        setActiveSession(null)
+        setMessages([])
+      }
+    } catch (err) {
+      console.error(err)
+      setError('Impossible de supprimer la conversation.')
     }
   }
 
@@ -56,6 +80,7 @@ export default function ChatPage() {
     const tempId = Date.now()
     setMessages(prev => [...prev, { id: tempId, role: 'user', content }])
     setSending(true)
+    setError(null)
     try {
       const r = await client.post(`/chat/sessions/${session.id}/messages`, { content, use_web: useWeb })
       setMessages(prev => [
@@ -66,7 +91,9 @@ export default function ChatPage() {
       const newTitle = r.data.session_title
       setSessions(prev => prev.map(s => s.id === session.id ? { ...s, title: newTitle } : s))
       setActiveSession(prev => ({ ...prev, title: newTitle }))
-    } catch {
+    } catch (err) {
+      console.error(err)
+      setError("L'envoi a echoue. Reessayez.")
       setMessages(prev => prev.filter(m => m.id !== tempId))
     } finally {
       setSending(false)
@@ -80,12 +107,17 @@ export default function ChatPage() {
 
   const createSessionAndSend = async (content) => {
     if (sending) return
-    const r = await client.post('/chat/sessions', {})
-    const newSession = r.data
-    setSessions(prev => [newSession, ...prev])
-    setActiveSession(newSession)
-    setMessages([])
-    await sendMessageToSession(newSession, content)
+    try {
+      const r = await client.post('/chat/sessions', {})
+      const newSession = r.data
+      setSessions(prev => [newSession, ...prev])
+      setActiveSession(newSession)
+      setMessages([])
+      await sendMessageToSession(newSession, content)
+    } catch (err) {
+      console.error(err)
+      setError('Impossible de demarrer la conversation.')
+    }
   }
 
   return (
@@ -100,6 +132,12 @@ export default function ChatPage() {
         onLogout={logout}
       />
       <main className="chat-main">
+        {error && (
+          <div className="chat-error" role="alert">
+            <span>{error}</span>
+            <button className="chat-error-close" onClick={() => setError(null)} aria-label="Fermer le message">×</button>
+          </div>
+        )}
         {activeSession ? (
           <>
             <header className="chat-header">

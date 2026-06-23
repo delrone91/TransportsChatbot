@@ -32,7 +32,8 @@ export default function MessageInput({ onSend, disabled }) {
     rec.onerror = () => setListening(false)
 
     rec.onresult = (e) => {
-      const transcript = e.results[0][0].transcript
+      const transcript = e.results?.[0]?.[0]?.transcript
+      if (!transcript) return
       setValue(prev => (prev ? prev + ' ' + transcript : transcript))
       textareaRef.current?.focus()
     }
@@ -45,7 +46,7 @@ export default function MessageInput({ onSend, disabled }) {
     if (!value.trim() || disabled) return
     onSend(value.trim(), useWeb)
     setValue('')
-    textareaRef.current.style.height = 'auto'
+    if (textareaRef.current) textareaRef.current.style.height = 'auto'
   }
 
   const handleKeyDown = (e) => {
@@ -69,6 +70,7 @@ export default function MessageInput({ onSend, disabled }) {
           onClick={() => setUseWeb(v => !v)}
           title={useWeb ? 'Recherche web activee' : 'Activer la recherche web'}
           type="button"
+          disabled={disabled}
         >
           Web
         </button>
@@ -87,6 +89,7 @@ export default function MessageInput({ onSend, disabled }) {
             onClick={toggleVoice}
             type="button"
             title={listening ? "Arreter l'ecoute" : 'Dicter la question'}
+            disabled={disabled}
           >
             {listening ? (
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">

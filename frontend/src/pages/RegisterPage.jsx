@@ -43,16 +43,16 @@ export default function RegisterPage() {
 
           <form onSubmit={submit}>
             <div className="form-group">
-              <label>Nom d'utilisateur</label>
-              <input type="text" value={form.username} onChange={update('username')} required autoFocus />
+              <label htmlFor="register-username">Nom d'utilisateur</label>
+              <input id="register-username" type="text" value={form.username} onChange={update('username')} required autoFocus />
             </div>
             <div className="form-group">
-              <label>Email</label>
-              <input type="email" value={form.email} onChange={update('email')} required />
+              <label htmlFor="register-email">Email</label>
+              <input id="register-email" type="email" value={form.email} onChange={update('email')} required />
             </div>
             <div className="form-group">
-              <label>Mot de passe <span className="label-note">min. 6 caracteres</span></label>
-              <input type="password" value={form.password} onChange={update('password')} minLength={6} required />
+              <label htmlFor="register-password">Mot de passe <span className="label-note">min. 6 caracteres</span></label>
+              <input id="register-password" type="password" value={form.password} onChange={update('password')} minLength={6} required />
             </div>
             {error && <p className="form-error">{error}</p>}
             <button type="submit" className="btn-primary" disabled={loading}>

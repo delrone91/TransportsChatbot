@@ -6,6 +6,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
+  height: 100dvh;
   position: relative;
   box-shadow: 10px 0 30px rgba(28, 41, 56, 0.04);
 }
@@ -163,7 +164,23 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: color 0.12s, background 0.12s;
+  opacity: 0;
+  pointer-events: none;
+  transition: color 0.12s, background 0.12s, opacity 0.12s;
+}
+
+.session-item:hover .btn-del,
+.session-item.active .btn-del {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Ecran tactile (pas de survol) : le bouton supprimer reste visible */
+@media (hover: none) {
+  .btn-del {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
 .btn-del:hover {
@@ -243,14 +260,40 @@
   background: #fff5f4;
 }
 
+/* Bouton hamburger : visible uniquement sur mobile */
+.sidebar-toggle {
+  display: none;
+  margin-left: auto;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
 @media (max-width: 900px) {
   .sidebar {
     width: 100%;
     min-width: 0;
     height: auto;
-    max-height: 190px;
+    max-height: 66px;
+    overflow: hidden;
+    flex-shrink: 0;
     border-right: none;
     border-bottom: 1px solid var(--border);
+    box-shadow: none;
+    transition: max-height 0.25s ease;
+  }
+
+  /* deplie : historique + footer visibles et defilables */
+  .sidebar--open {
+    max-height: 82vh;
+    overflow-y: auto;
   }
 
   .sidebar-top {
@@ -258,14 +301,21 @@
   }
 
   .sidebar-brand {
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+  }
+
+  .sidebar-toggle {
+    display: inline-flex;
+  }
+
+  /* replie : seule la barre du haut (marque + hamburger) reste visible */
+  .sidebar:not(.sidebar--open) .btn-new,
+  .sidebar:not(.sidebar--open) .sessions-list,
+  .sidebar:not(.sidebar--open) .sidebar-footer {
+    display: none;
   }
 
   .sessions-list {
-    display: none;
-  }
-
-  .sidebar-footer {
-    display: none;
+    flex: none;
   }
 }

@@ -1,5 +1,5 @@
 .input-bar {
-  padding: 14px clamp(18px, 18vw, 260px);
+  padding: 14px clamp(18px, 7vw, 120px);
   background: rgba(244, 246, 248, 0.86);
   border-top: 1px solid var(--border-light);
   flex-shrink: 0;
@@ -128,7 +128,7 @@
 }
 
 .send-btn:disabled {
-  opacity: 0.35;
+  opacity: 0.5;
   cursor: not-allowed;
   transform: none;
 }
@@ -151,7 +151,19 @@
   }
 
   .web-toggle {
-    min-width: 38px;
+    min-width: 40px;
+    height: 40px;
     padding: 0 8px;
+  }
+
+  .mic-btn,
+  .send-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  /* 16px : evite le zoom automatique de l'input au focus sur iOS */
+  .input-wrapper textarea {
+    font-size: 16px;
   }
 }

@@ -43,12 +43,12 @@ export default function LoginPage() {
 
           <form onSubmit={submit}>
             <div className="form-group">
-              <label>Email</label>
-              <input type="email" value={form.email} onChange={update('email')} required autoFocus />
+              <label htmlFor="login-email">Email</label>
+              <input id="login-email" type="email" value={form.email} onChange={update('email')} required autoFocus />
             </div>
             <div className="form-group">
-              <label>Mot de passe</label>
-              <input type="password" value={form.password} onChange={update('password')} required />
+              <label htmlFor="login-password">Mot de passe</label>
+              <input id="login-password" type="password" value={form.password} onChange={update('password')} required />
             </div>
             {error && <p className="form-error">{error}</p>}
             <button type="submit" className="btn-primary" disabled={loading}>

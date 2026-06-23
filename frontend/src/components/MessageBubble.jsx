@@ -51,7 +51,7 @@ export default function MessageBubble({ message }) {
           <span className="web-sources-label">Sources consultees</span>
           {webSources.map((s, i) => (
             <a
-              key={i}
+              key={s.url || i}
               href={s.url}
               target="_blank"
               rel="noopener noreferrer"
@@ -65,8 +65,8 @@ export default function MessageBubble({ message }) {
 
       {ragSources.length > 0 && (
         <div className="sources">
-          {ragSources.map((src, index) => (
-            <div key={index}>
+          {ragSources.map((src) => (
+            <div key={`${src.source}-${src.type}`}>
               {src.source} - {src.type}
             </div>
           ))}

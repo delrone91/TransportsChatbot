@@ -13,7 +13,10 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const token = localStorage.getItem('token')
-    if (!token) return
+    if (!token) {
+      setLoading(false)
+      return
+    }
 
     client.get('/auth/me')
       .then(r => setUser(r.data))
@@ -36,11 +39,12 @@ export function AuthProvider({ children }) {
   const logout = async () => {
     try {
       await client.post('/auth/logout')
-    } catch {
+    } catch (err) {
+      console.error('Logout serveur echoue, deconnexion locale forcee', err)
+    } finally {
       localStorage.removeItem('token')
+      setUser(null)
     }
-    localStorage.removeItem('token')
-    setUser(null)
   }
 
   return (
