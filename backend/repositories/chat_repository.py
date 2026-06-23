@@ -33,8 +33,8 @@ class ChatRepository:
     def delete_session(self, session: ConversationSession) -> None:
         self.db.delete(session)
 
-    def add_message(self, session_id: int, role: str, content: str, source: str | None = None) -> Message:
-        msg = Message(role=role, content=content, session_id=session_id, source=source)
+    def add_message(self, session_id: int, role: str, content: str, source: str | None = None, sources_json: str | None = None) -> Message:
+        msg = Message(role=role, content=content, session_id=session_id, source=source, sources_json=sources_json)
         self.db.add(msg)
         return msg
 

@@ -34,3 +34,17 @@ def init_db():
     # avant de créer les tables
     import models  # noqa: F401
     Base.metadata.create_all(bind=engine)
+    _run_migrations()
+
+
+def _run_migrations():
+    # create_all ne modifie pas une table deja existante : on ajoute ici les
+    # colonnes manquantes (ex. sources_json sur la base Neon deja creee).
+    from sqlalchemy import inspect, text
+    inspector = inspect(engine)
+    if 'messages' not in inspector.get_table_names():
+        return
+    columns = [c['name'] for c in inspector.get_columns('messages')]
+    if 'sources_json' not in columns:
+        with engine.begin() as conn:
+            conn.execute(text('ALTER TABLE messages ADD COLUMN sources_json TEXT'))

@@ -1,4 +1,5 @@
 from __future__ import annotations
+import json
 from datetime import datetime
 from repositories.chat_repository import ChatRepository
 from core.rag import retrieve
@@ -62,7 +63,13 @@ class ChatService:
         llm_messages = self._build_llm_messages(history, content, context_docs)
         reply = call_llm(llm_messages)
 
-        assistant_msg = self.repo.add_message(session_id, 'assistant', reply, source)
+        rag_sources = [
+            {"source": doc.get("source"), "type": doc.get("type"), "score": doc.get("score")}
+            for doc in context_docs
+        ] if source == "rag" else []
+        sources_json = json.dumps({"web_sources": web_sources, "rag_sources": rag_sources})
+
+        assistant_msg = self.repo.add_message(session_id, 'assistant', reply, source, sources_json)
         self.repo.touch_session(session)
         self.repo.commit()
 
@@ -74,14 +81,7 @@ class ChatService:
                 'content': reply,
                 'source': source,
                 'web_sources': web_sources,
-                'rag_sources': [
-                {
-                    "source": doc.get("source"),
-                    "type": doc.get("type"),
-                    "score": doc.get("score"),
-                }
-                for doc in context_docs
-            ] if source == "rag" else [],
+                'rag_sources': rag_sources,
             },
             'session_title': session.title,
         }
@@ -140,10 +140,20 @@ class ChatService:
 
     @staticmethod
     def _serialize_message(m) -> dict:
+        web_sources, rag_sources = [], []
+        if m.sources_json:
+            try:
+                parsed = json.loads(m.sources_json)
+                web_sources = parsed.get('web_sources', [])
+                rag_sources = parsed.get('rag_sources', [])
+            except (ValueError, TypeError):
+                pass
         return {
             'id': m.id,
             'role': m.role,
             'content': m.content,
             'source': m.source,
+            'web_sources': web_sources,
+            'rag_sources': rag_sources,
             'created_at': m.created_at.isoformat(),
         }
