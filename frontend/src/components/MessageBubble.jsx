@@ -3,8 +3,8 @@ import remarkGfm from 'remark-gfm'
 import './MessageBubble.css'
 
 const SOURCE_LABELS = {
-  rag: { icon: '📊', label: 'Données SNCF/IDFM' },
-  web: { icon: '🌐', label: 'Source web' },
+  rag: { label: 'Donnees locales' },
+  web: { label: 'Web verifie' },
 }
 
 function normalizeMarkdown(content = '') {
@@ -42,13 +42,13 @@ export default function MessageBubble({ message }) {
 
       {badge && webSources.length === 0 && (
         <div className={`source-badge source-badge--${message.source}`}>
-          {badge.icon} {badge.label}
+          {badge.label}
         </div>
       )}
 
       {webSources.length > 0 && (
         <div className="web-sources">
-          <span className="web-sources-label">🌐 Sources :</span>
+          <span className="web-sources-label">Sources consultees</span>
           {webSources.map((s, i) => (
             <a
               key={i}
@@ -67,7 +67,7 @@ export default function MessageBubble({ message }) {
         <div className="sources">
           {ragSources.map((src, index) => (
             <div key={index}>
-              Source : {src.source} - {src.type}
+              {src.source} - {src.type}
             </div>
           ))}
         </div>

@@ -18,7 +18,7 @@ export default function LoginPage() {
     try {
       await login(form.email, form.password)
     } catch (err) {
-      setError(err.response?.data?.error || 'Erreur de connexion')
+      setError(err.response?.data?.error || 'Connexion impossible')
     } finally {
       setLoading(false)
     }
@@ -26,34 +26,51 @@ export default function LoginPage() {
 
   return (
     <div className="auth-page">
-      <div className="auth-box">
-        <div className="auth-logo">
-          <div className="auth-logo-icon">
-            <img src="/logo.png" alt="NavigIA" />
+      <section className="auth-shell">
+        <div className="auth-panel">
+          <div className="auth-logo">
+            <div className="auth-logo-icon">
+              <img src="/logo.png" alt="NavigIA" />
+            </div>
+            <div>
+              <div className="auth-logo-name">NavigIA</div>
+              <p className="auth-subtitle">Infos transports Ile-de-France</p>
+            </div>
           </div>
-          <div className="auth-logo-name">NAVIG<span>IA</span></div>
-        </div>
-        <p className="auth-subtitle">Assistant transports Île-de-France</p>
 
-        <h1>Connexion</h1>
-        <form onSubmit={submit}>
-          <div className="form-group">
-            <label>Email</label>
-            <input type="email" value={form.email} onChange={update('email')} required autoFocus />
+          <h1>Bon retour</h1>
+          <p className="auth-intro">Retrouvez vos recherches et vos conversations transport.</p>
+
+          <form onSubmit={submit}>
+            <div className="form-group">
+              <label>Email</label>
+              <input type="email" value={form.email} onChange={update('email')} required autoFocus />
+            </div>
+            <div className="form-group">
+              <label>Mot de passe</label>
+              <input type="password" value={form.password} onChange={update('password')} required />
+            </div>
+            {error && <p className="form-error">{error}</p>}
+            <button type="submit" className="btn-primary" disabled={loading}>
+              {loading ? 'Connexion...' : 'Se connecter'}
+            </button>
+          </form>
+          <p className="auth-link">
+            Pas encore de compte ? <Link to="/register">Creer un compte</Link>
+          </p>
+        </div>
+
+        <aside className="auth-aside">
+          <p className="auth-aside-label">A portee de main</p>
+          <h2>Les reponses utiles avant de prendre la route.</h2>
+          <div className="auth-lines">
+            <span style={{ background: 'var(--rera)' }}>A</span>
+            <span style={{ background: 'var(--rerb)' }}>B</span>
+            <span style={{ background: 'var(--rerc)', color: '#2d2d2d' }}>C</span>
+            <span style={{ background: 'var(--rerd)' }}>D</span>
           </div>
-          <div className="form-group">
-            <label>Mot de passe</label>
-            <input type="password" value={form.password} onChange={update('password')} required />
-          </div>
-          {error && <p className="form-error">{error}</p>}
-          <button type="submit" className="btn-primary" disabled={loading}>
-            {loading ? 'Connexion...' : 'Se connecter'}
-          </button>
-        </form>
-        <p className="auth-link">
-          Pas encore de compte ? <Link to="/register">S'inscrire</Link>
-        </p>
-      </div>
+        </aside>
+      </section>
     </div>
   )
 }
