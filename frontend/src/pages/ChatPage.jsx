@@ -39,7 +39,7 @@ export default function ChatPage() {
       setError(null)
     } catch (err) {
       console.error(err)
-      setError('Impossible de creer une conversation.')
+      setError('Impossible de créer une conversation.')
     }
   }
 
@@ -51,7 +51,7 @@ export default function ChatPage() {
     setError(null)
     try {
       const r = await client.get(`/chat/sessions/${session.id}`)
-      // on n'applique la reponse que si c'est toujours la derniere session demandee
+      // on n'applique la réponse que si c'est toujours la dernière session demandée
       if (selectionRef.current === reqId) setMessages(r.data.messages)
     } catch (err) {
       if (selectionRef.current === reqId) {
@@ -93,7 +93,7 @@ export default function ChatPage() {
       setActiveSession(prev => ({ ...prev, title: newTitle }))
     } catch (err) {
       console.error(err)
-      setError("L'envoi a echoue. Reessayez.")
+      setError("L'envoi a échoué. Réessayez.")
       setMessages(prev => prev.filter(m => m.id !== tempId))
     } finally {
       setSending(false)
@@ -116,7 +116,7 @@ export default function ChatPage() {
       await sendMessageToSession(newSession, content)
     } catch (err) {
       console.error(err)
-      setError('Impossible de demarrer la conversation.')
+      setError('Impossible de démarrer la conversation.')
     }
   }
 
@@ -154,21 +154,21 @@ export default function ChatPage() {
             </div>
             <h2 className="empty-title">Infos transports, sans tourner en rond.</h2>
             <p className="empty-subtitle">
-              Tarifs, gares, accessibilite et donnees SNCF/IDFM dans une interface simple a consulter.
+              Tarifs, gares, accessibilité et données SNCF/IDFM dans une interface simple à consulter.
             </p>
             <p className="suggestions-label">Questions utiles</p>
             <div className="empty-suggestions">
               <button className="suggestion" onClick={() => createSessionAndSend('Quel est le prix du forfait Navigo mensuel ?')}>
                 Quel est le prix du forfait Navigo mensuel ?
               </button>
-              <button className="suggestion" onClick={() => createSessionAndSend('Quelle est la frequentation de la gare Paris Gare de Lyon en 2024 ?')}>
-                Quelle est la frequentation de la gare Paris Gare de Lyon en 2024 ?
+              <button className="suggestion" onClick={() => createSessionAndSend('Quelle est la fréquentation de la gare Paris Gare de Lyon en 2024 ?')}>
+                Quelle est la fréquentation de la gare Paris Gare de Lyon en 2024 ?
               </button>
-              <button className="suggestion" onClick={() => createSessionAndSend('Quel est le taux de proprete de la gare de Bordeaux Saint-Jean ?')}>
-                Quel est le taux de proprete de la gare de Bordeaux Saint-Jean ?
+              <button className="suggestion" onClick={() => createSessionAndSend('Quel est le taux de propreté de la gare de Bordeaux Saint-Jean ?')}>
+                Quel est le taux de propreté de la gare de Bordeaux Saint-Jean ?
               </button>
-              <button className="suggestion" onClick={() => createSessionAndSend('Quels equipements PMR sont disponibles en gare ?')}>
-                Quels equipements PMR sont disponibles en gare ?
+              <button className="suggestion" onClick={() => createSessionAndSend('Quels équipements PMR sont disponibles en gare ?')}>
+                Quels équipements PMR sont disponibles en gare ?
               </button>
             </div>
             <button className="btn-create" onClick={createSession}>

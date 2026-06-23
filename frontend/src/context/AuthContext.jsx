@@ -40,7 +40,7 @@ export function AuthProvider({ children }) {
     try {
       await client.post('/auth/logout')
     } catch (err) {
-      console.error('Logout serveur echoue, deconnexion locale forcee', err)
+      console.error('Logout serveur échoué, déconnexion locale forcée', err)
     } finally {
       localStorage.removeItem('token')
       setUser(null)

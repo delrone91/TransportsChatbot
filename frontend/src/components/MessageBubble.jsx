@@ -3,17 +3,17 @@ import remarkGfm from 'remark-gfm'
 import './MessageBubble.css'
 
 const SOURCE_LABELS = {
-  rag: { label: 'Donnees locales' },
-  web: { label: 'Web verifie' },
+  rag: { label: 'Données locales' },
+  web: { label: 'Web vérifié' },
 }
 
 // Jeux de donnees locaux (RAG) : libelle + page open data officielle
 const RAG_SOURCES = {
-  tarif:    { label: 'Tarifs Ile-de-France Mobilites', url: 'https://data.iledefrance-mobilites.fr/explore/dataset/titres-et-tarifs/information/' },
+  tarif:    { label: 'Tarifs Île-de-France Mobilités', url: 'https://data.iledefrance-mobilites.fr/explore/dataset/titres-et-tarifs/information/' },
   horaire:  { label: 'Horaires des gares SNCF', url: 'https://ressources.data.sncf.com/explore/dataset/horaires-des-gares1/information/' },
-  freq:     { label: 'Frequentation des gares SNCF', url: 'https://ressources.data.sncf.com/explore/dataset/frequentation-gares/information/' },
-  equip:    { label: 'Equipements accessibilite SNCF', url: 'https://ressources.data.sncf.com/explore/dataset/equipements-accessibilite-sncf/information/' },
-  proprete: { label: 'Proprete en gare SNCF', url: 'https://ressources.data.sncf.com/explore/dataset/proprete-en-gare/information/' },
+  freq:     { label: 'Fréquentation des gares SNCF', url: 'https://ressources.data.sncf.com/explore/dataset/frequentation-gares/information/' },
+  equip:    { label: 'Équipements accessibilité SNCF', url: 'https://ressources.data.sncf.com/explore/dataset/equipements-accessibilite-sncf/information/' },
+  proprete: { label: 'Propreté en gare SNCF', url: 'https://ressources.data.sncf.com/explore/dataset/proprete-en-gare/information/' },
 }
 
 function normalizeMarkdown(content = '') {
@@ -58,7 +58,7 @@ export default function MessageBubble({ message }) {
 
       {webSources.length > 0 && (
         <div className="web-sources">
-          <span className="web-sources-label">Sources consultees</span>
+          <span className="web-sources-label">Sources consultées</span>
           {webSources.map((s, i) => (
             <a
               key={s.url || i}

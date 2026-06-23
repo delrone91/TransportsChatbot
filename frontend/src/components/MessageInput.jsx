@@ -68,7 +68,7 @@ export default function MessageInput({ onSend, disabled }) {
         <button
           className={`web-toggle ${useWeb ? 'web-toggle--active' : ''}`}
           onClick={() => setUseWeb(v => !v)}
-          title={useWeb ? 'Recherche web activee' : 'Activer la recherche web'}
+          title={useWeb ? 'Recherche web activée' : 'Activer la recherche web'}
           type="button"
           disabled={disabled}
         >
@@ -79,7 +79,7 @@ export default function MessageInput({ onSend, disabled }) {
           value={value}
           onChange={handleInput}
           onKeyDown={handleKeyDown}
-          placeholder={useWeb ? 'Chercher une information recente...' : 'Demandez un tarif, une gare, un equipement...'}
+          placeholder={useWeb ? 'Chercher une information récente...' : 'Demandez un tarif, une gare, un équipement...'}
           disabled={disabled}
           rows={1}
         />
@@ -88,7 +88,7 @@ export default function MessageInput({ onSend, disabled }) {
             className={`mic-btn ${listening ? 'mic-btn--active' : ''}`}
             onClick={toggleVoice}
             type="button"
-            title={listening ? "Arreter l'ecoute" : 'Dicter la question'}
+            title={listening ? "Arrêter l'écoute" : 'Dicter la question'}
             disabled={disabled}
           >
             {listening ? (
@@ -110,7 +110,7 @@ export default function MessageInput({ onSend, disabled }) {
         </button>
       </div>
       <p className={useWeb ? 'web-hint' : 'input-hint'}>
-        {useWeb ? 'Recherche sur des sources en ligne fiables.' : 'Entree pour envoyer, Shift + Entree pour aller a la ligne.'}
+        {useWeb ? 'Recherche sur des sources en ligne fiables.' : 'Entrée pour envoyer, Shift + Entrée pour aller à la ligne.'}
       </p>
     </div>
   )

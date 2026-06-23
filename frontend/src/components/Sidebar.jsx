@@ -23,7 +23,7 @@ export default function Sidebar({ sessions, activeSession, user, onSelect, onCre
           </div>
           <div>
             <div className="brand-name">NavigIA</div>
-            <div className="brand-subtitle">Transports Ile-de-France</div>
+            <div className="brand-subtitle">Transports Île-de-France</div>
           </div>
           <button
             className="sidebar-toggle"
@@ -77,10 +77,10 @@ export default function Sidebar({ sessions, activeSession, user, onSelect, onCre
           <div className="user-avatar">{user?.username?.[0]?.toUpperCase()}</div>
           <div className="user-copy">
             <span className="user-name">{user?.username}</span>
-            <span className="user-status">Connecte</span>
+            <span className="user-status">Connecté</span>
           </div>
         </div>
-        <button className="btn-logout" onClick={onLogout} title="Se deconnecter" aria-label="Se deconnecter">
+        <button className="btn-logout" onClick={onLogout} title="Se déconnecter" aria-label="Se déconnecter">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
             <polyline points="16 17 21 12 16 7" />

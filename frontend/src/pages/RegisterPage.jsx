@@ -34,11 +34,11 @@ export default function RegisterPage() {
             </div>
             <div>
               <div className="auth-logo-name">NavigIA</div>
-              <p className="auth-subtitle">Infos transports Ile-de-France</p>
+              <p className="auth-subtitle">Infos transports Île-de-France</p>
             </div>
           </div>
 
-          <h1>Creer un compte</h1>
+          <h1>Créer un compte</h1>
           <p className="auth-intro">Gardez vos recherches utiles et reprenez vos conversations plus tard.</p>
 
           <form onSubmit={submit}>
@@ -51,16 +51,16 @@ export default function RegisterPage() {
               <input id="register-email" type="email" value={form.email} onChange={update('email')} required />
             </div>
             <div className="form-group">
-              <label htmlFor="register-password">Mot de passe <span className="label-note">min. 6 caracteres</span></label>
+              <label htmlFor="register-password">Mot de passe <span className="label-note">min. 6 caractères</span></label>
               <input id="register-password" type="password" value={form.password} onChange={update('password')} minLength={6} required />
             </div>
             {error && <p className="form-error">{error}</p>}
             <button type="submit" className="btn-primary" disabled={loading}>
-              {loading ? 'Creation...' : 'Creer mon compte'}
+              {loading ? 'Création...' : 'Créer mon compte'}
             </button>
           </form>
           <p className="auth-link">
-            Deja un compte ? <Link to="/login">Se connecter</Link>
+            Déjà un compte ? <Link to="/login">Se connecter</Link>
           </p>
         </div>
 

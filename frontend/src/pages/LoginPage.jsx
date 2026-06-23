@@ -34,7 +34,7 @@ export default function LoginPage() {
             </div>
             <div>
               <div className="auth-logo-name">NavigIA</div>
-              <p className="auth-subtitle">Infos transports Ile-de-France</p>
+              <p className="auth-subtitle">Infos transports Île-de-France</p>
             </div>
           </div>
 
@@ -56,13 +56,13 @@ export default function LoginPage() {
             </button>
           </form>
           <p className="auth-link">
-            Pas encore de compte ? <Link to="/register">Creer un compte</Link>
+            Pas encore de compte ? <Link to="/register">Créer un compte</Link>
           </p>
         </div>
 
         <aside className="auth-aside">
-          <p className="auth-aside-label">A portee de main</p>
-          <h2>Les reponses utiles avant de prendre la route.</h2>
+          <p className="auth-aside-label">À portée de main</p>
+          <h2>Les réponses utiles avant de prendre la route.</h2>
           <div className="auth-lines">
             <span style={{ background: 'var(--rera)' }}>A</span>
             <span style={{ background: 'var(--rerb)' }}>B</span>
