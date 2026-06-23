@@ -22,8 +22,7 @@
   border: 1px solid #abefc6;
 }
 
-.web-sources,
-.sources {
+.web-sources {
   display: flex;
   flex-direction: column;
   gap: 5px;
@@ -39,8 +38,7 @@
   letter-spacing: 0.08em;
 }
 
-.web-source-link,
-.sources div {
+.web-source-link {
   font-size: 12px;
   color: var(--text-dim);
   text-decoration: none;
@@ -54,4 +52,22 @@
 .web-source-link:hover {
   color: var(--blue);
   text-decoration: underline;
+}
+
+/* ── Sources RAG (jeux de donnees locaux) ──── */
+.rag-sources {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.rag-source-chip {
+  font-size: 11.5px;
+  color: var(--text-dim);
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px 10px;
 }

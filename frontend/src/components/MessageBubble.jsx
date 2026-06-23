@@ -7,6 +7,15 @@ const SOURCE_LABELS = {
   web: { label: 'Web verifie' },
 }
 
+// Libelles lisibles pour les jeux de donnees locaux (RAG)
+const RAG_SOURCE_LABELS = {
+  tarif: 'Tarifs Ile-de-France Mobilites',
+  horaire: 'Horaires des gares SNCF',
+  freq: 'Frequentation des gares SNCF',
+  equip: 'Equipements accessibilite SNCF',
+  proprete: 'Proprete en gare SNCF',
+}
+
 function normalizeMarkdown(content = '') {
   return content
     .replace(/\|\s+\|(?=\s*[-\wÀ-ÿ])/g, '|\n|')
@@ -22,12 +31,8 @@ export default function MessageBubble({ message }) {
     ? message.web_sources
     : []
 
-  const ragSources = message.role === 'assistant' && message.rag_sources?.length > 0
-    ? Array.from(
-        new Map(
-          message.rag_sources.map((src) => [`${src.source}-${src.type}`, src])
-        ).values()
-      )
+  const ragLabels = message.role === 'assistant' && message.rag_sources?.length > 0
+    ? [...new Set(message.rag_sources.map((src) => RAG_SOURCE_LABELS[src.type] || src.source))]
     : []
 
   const renderedContent = normalizeMarkdown(message.content)
@@ -63,12 +68,10 @@ export default function MessageBubble({ message }) {
         </div>
       )}
 
-      {ragSources.length > 0 && (
-        <div className="sources">
-          {ragSources.map((src) => (
-            <div key={`${src.source}-${src.type}`}>
-              {src.source} - {src.type}
-            </div>
+      {ragLabels.length > 0 && (
+        <div className="rag-sources">
+          {ragLabels.map((label) => (
+            <span key={label} className="rag-source-chip">{label}</span>
           ))}
         </div>
       )}
