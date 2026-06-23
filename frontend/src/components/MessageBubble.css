@@ -70,4 +70,20 @@
   border: 1px solid var(--border);
   border-radius: 999px;
   padding: 3px 10px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.12s, border-color 0.12s, background 0.12s;
+}
+
+.rag-source-chip::after {
+  content: '↗';
+  margin-left: 5px;
+  font-size: 10px;
+  opacity: 0.6;
+}
+
+.rag-source-chip:hover {
+  color: var(--blue);
+  border-color: #c9dceb;
+  background: #e7f0f8;
 }

@@ -7,13 +7,13 @@ const SOURCE_LABELS = {
   web: { label: 'Web verifie' },
 }
 
-// Libelles lisibles pour les jeux de donnees locaux (RAG)
-const RAG_SOURCE_LABELS = {
-  tarif: 'Tarifs Ile-de-France Mobilites',
-  horaire: 'Horaires des gares SNCF',
-  freq: 'Frequentation des gares SNCF',
-  equip: 'Equipements accessibilite SNCF',
-  proprete: 'Proprete en gare SNCF',
+// Jeux de donnees locaux (RAG) : libelle + page open data officielle
+const RAG_SOURCES = {
+  tarif:    { label: 'Tarifs Ile-de-France Mobilites', url: 'https://data.iledefrance-mobilites.fr/explore/dataset/titres-et-tarifs/information/' },
+  horaire:  { label: 'Horaires des gares SNCF', url: 'https://ressources.data.sncf.com/explore/dataset/horaires-des-gares1/information/' },
+  freq:     { label: 'Frequentation des gares SNCF', url: 'https://ressources.data.sncf.com/explore/dataset/frequentation-gares/information/' },
+  equip:    { label: 'Equipements accessibilite SNCF', url: 'https://ressources.data.sncf.com/explore/dataset/equipements-accessibilite-sncf/information/' },
+  proprete: { label: 'Proprete en gare SNCF', url: 'https://ressources.data.sncf.com/explore/dataset/proprete-en-gare/information/' },
 }
 
 function normalizeMarkdown(content = '') {
@@ -31,8 +31,13 @@ export default function MessageBubble({ message }) {
     ? message.web_sources
     : []
 
-  const ragLabels = message.role === 'assistant' && message.rag_sources?.length > 0
-    ? [...new Set(message.rag_sources.map((src) => RAG_SOURCE_LABELS[src.type] || src.source))]
+  const ragSources = message.role === 'assistant' && message.rag_sources?.length > 0
+    ? [...new Map(
+        message.rag_sources
+          .map((src) => RAG_SOURCES[src.type])
+          .filter(Boolean)
+          .map((s) => [s.url, s])
+      ).values()]
     : []
 
   const renderedContent = normalizeMarkdown(message.content)
@@ -68,10 +73,18 @@ export default function MessageBubble({ message }) {
         </div>
       )}
 
-      {ragLabels.length > 0 && (
+      {ragSources.length > 0 && (
         <div className="rag-sources">
-          {ragLabels.map((label) => (
-            <span key={label} className="rag-source-chip">{label}</span>
+          {ragSources.map((s) => (
+            <a
+              key={s.url}
+              href={s.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rag-source-chip"
+            >
+              {s.label}
+            </a>
           ))}
         </div>
       )}
